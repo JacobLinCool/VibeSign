@@ -8,12 +8,17 @@
 import SwiftUI
 import UIKit
 
-struct PencilSample: Codable {
+struct PencilSample: Codable, Equatable {
     let timestamp: TimeInterval
     let location: CGPoint
     let force: CGFloat
     let altitude: CGFloat
     let azimuth: CGFloat
+
+    static func == (lhs: PencilSample, rhs: PencilSample) -> Bool {
+        return lhs.timestamp == rhs.timestamp && lhs.location == rhs.location
+            && lhs.force == rhs.force && lhs.altitude == rhs.altitude && lhs.azimuth == rhs.azimuth
+    }
 }
 
 struct SignatureRecord: Identifiable {
@@ -81,9 +86,17 @@ class PencilTrackView: UIView {
 
 struct SignaturePreview: View {
     let samples: [PencilSample]
+    var isAnimating: Bool = false
+
+    @State private var animatedSamples: [PencilSample] = []  // Samples to render
+    @State private var animationTimer: Timer? = nil
+    @State private var currentIndex: Int = 0
+    @State private var isPausedForLoop: Bool = false
+
     var body: some View {
         GeometryReader { geo in
-            let points = samples.map { $0.location }
+            // Use animatedSamples for drawing
+            let points = animatedSamples.map { $0.location }
 
             if points.isEmpty {
                 // Render nothing or a placeholder if there are no points.
@@ -118,7 +131,7 @@ struct SignaturePreview: View {
                 let offsetY = padding + (drawingAreaHeight - scaledContentHeight) / 2
 
                 Path { path in
-                    for pt in points {
+                    for pt in points {  // Use the 'points' variable derived from 'pointsToDraw'
                         // Apply scaling and translation from the original coordinate system (minX, minY)
                         let x = (pt.x - minX) * scale + offsetX
                         let y = (pt.y - minY) * scale + offsetY
@@ -134,6 +147,76 @@ struct SignaturePreview: View {
                 .fill(Color.accentColor)  // Fill the dots with the accent color
             }
         }
+        .onAppear(perform: manageAnimation)
+        .onDisappear {
+            animationTimer?.invalidate()
+            animationTimer = nil
+        }
+        .onChange(of: samples) { manageAnimation() }
+        .onChange(of: isAnimating) { manageAnimation() }
+    }
+
+    private func manageAnimation() {
+        animationTimer?.invalidate()
+        animationTimer = nil
+        animatedSamples = []
+        currentIndex = 0
+        isPausedForLoop = false
+
+        if isAnimating && !samples.isEmpty {
+            advanceAnimation()
+        } else {
+            animatedSamples = samples  // Show all points if not animating
+        }
+    }
+
+    private func advanceAnimation() {
+        guard isAnimating && !samples.isEmpty else { return }
+
+        if isPausedForLoop {
+            // Currently paused, timer fired to end pause
+            isPausedForLoop = false
+            currentIndex = 0
+            animatedSamples = []
+            // Fall through to add the first point of the new loop
+        }
+
+        if currentIndex < samples.count {
+            animatedSamples.append(samples[currentIndex])
+
+            let delay: TimeInterval
+            if currentIndex + 1 < samples.count {
+                // Time until next point
+                delay = samples[currentIndex + 1].timestamp - samples[currentIndex].timestamp
+            } else {
+                // This is the last point, schedule pause
+                isPausedForLoop = true
+                delay = 3.0  // Pause for 3 seconds
+            }
+
+            // Ensure delay is non-negative and has a minimum value if timestamps are too close or identical.
+            let effectiveDelay = max(delay, 0.001)  // Minimum delay of 1ms
+
+            animationTimer = Timer.scheduledTimer(withTimeInterval: effectiveDelay, repeats: false)
+            { _ in
+                if !self.isPausedForLoop {
+                    // If we just scheduled a pause, currentIndex is not incremented here.
+                    // It will be reset when the pause ends and advanceAnimation is called again.
+                    self.currentIndex += 1
+                }
+                self.advanceAnimation()  // Continue to next step (either next point or end pause)
+            }
+        } else if !isPausedForLoop {  // Should loop if all points are drawn and not currently in a pause cycle
+            // This case handles the restart after the last point if not going into a pause (e.g., if pause logic was different)
+            // Or if manageAnimation is called when animation was already complete.
+            currentIndex = 0
+            animatedSamples = []
+            if isAnimating && !samples.isEmpty {  // Ensure still should be animating
+                advanceAnimation()  // Restart animation
+            }
+        }
+        // If isPausedForLoop is true and currentIndex >= samples.count, it means the 3s pause timer is active.
+        // When that timer fires, it will call advanceAnimation, which will then reset isPausedForLoop and restart.
     }
 }
 
@@ -299,7 +382,7 @@ struct ContentView: View {
                 ShareSheet(activityItems: [documentToShare.fileURL])
             }
         }
-        .onChange(of: isRecording) { newValue in
+        .onChange(of: isRecording) { oldValue, newValue in
             if !newValue {
                 // Just stopped recording
                 // currentSamples should have been updated by PencilTracker's onStop callback by now.
@@ -393,7 +476,7 @@ struct SignatureDetailView: View {
             }
             .font(.caption)
             .foregroundColor(.secondary)
-            SignaturePreview(samples: samples)
+            SignaturePreview(samples: samples, isAnimating: true)  // Enable animation here
                 .frame(width: 200, height: 200)
                 .background(Color(.systemGray6))
                 .cornerRadius(12)

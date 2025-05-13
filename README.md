@@ -10,6 +10,7 @@ VibeSign is a simple iPadOS application designed for capturing and storing digit
 - **Signature History**: Displays saved signatures in a list with a preview, creation date, and key statistics (point count, duration, average force).
 - **Interactive Drawing Canvas**: A dedicated area for drawing signatures.
 - **Detailed View**: Tap a signature in the history to view a larger preview and the raw point data.
+- **Signature Replay**: Watch a replay of the signature being drawn in the detailed view.
 - **JSONL Export**: Export all signature data in JSON Lines format, ideal for data analysis. Each line is a JSON object representing one signature.
 - **Clear Canvas**: Easily clear the current drawing.
 - **Delete Signatures**: Remove individual signatures from the history.
@@ -50,7 +51,7 @@ VibeSign is a simple iPadOS application designed for capturing and storing digit
 - To create a new signature, tap "Start" and begin drawing on the canvas with an Apple Pencil. The app captures detailed stroke data.
 - Tap "Stop" to finish the current signature. The signature is automatically saved and added to the history.
 - The signature history is displayed in reverse chronological order (newest first).
-- Individual signatures can be selected from the list to view detailed information or be deleted.
+- Individual signatures can be selected from the list to view detailed information, including a replay of the signature being drawn, or be deleted.
 - The "Export All" button compiles all stored signatures into a `signatures.jsonl` file and presents a share sheet for saving or sending the file.
 
 ## Technical Details
@@ -59,6 +60,7 @@ VibeSign is a simple iPadOS application designed for capturing and storing digit
 - **Drawing Input**: Utilizes `UIViewRepresentable` to wrap a custom `UIView` (`PencilTrackView`) for capturing detailed touch data from Apple Pencil. This allows access to properties like `force`, `altitudeAngle`, and `azimuthAngle` from `UITouch`.
 - **Data Storage**: Signatures are currently stored in-memory. For persistence across app launches, further development would be needed (e.g., using Core Data, SwiftData, or saving to files).
 - **Data Export**: Employs `JSONEncoder` with ISO8601 date formatting for creating the JSONL export file. Each signature record in the export includes the creation date and an array of pencil samples.
+- **Signature Replay**: The detailed view allows for an animated replay of the signature, visualizing the drawing process based on the captured timestamps.
 
 ## Export Format (JSONL)
 
