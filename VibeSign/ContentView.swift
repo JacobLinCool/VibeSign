@@ -257,7 +257,6 @@ struct ContentView: View {
     @State private var showDeleteConfirm = false
     @State private var showDetailSheet = false
     @StateObject private var trackerController = PencilTrackerController()
-    @State private var showShareSheet = false
     @State private var documentToShare: TextFile? = nil
 
     var body: some View {
@@ -377,10 +376,8 @@ struct ContentView: View {
                     Text("This action cannot be undone.")
                 })
         }
-        .sheet(isPresented: $showShareSheet) {
-            if let documentToShare = documentToShare {
-                ShareSheet(activityItems: [documentToShare.fileURL])
-            }
+        .sheet(item: $documentToShare) { textFile in
+            ShareSheet(activityItems: [textFile.fileURL])
         }
         .onChange(of: isRecording) { oldValue, newValue in
             if !newValue {
@@ -433,7 +430,6 @@ struct ContentView: View {
         do {
             try jsonlString.write(to: fileURL, atomically: true, encoding: .utf8)
             self.documentToShare = TextFile(fileURL: fileURL)
-            self.showShareSheet = true
         } catch {
             print("Error writing to file: \(error)")
         }
@@ -442,7 +438,7 @@ struct ContentView: View {
 
 // Helper struct for sharing
 struct TextFile: Identifiable {
-    var id: URL { fileURL }
+    let id = UUID()  // Ensure unique ID for each instance
     let fileURL: URL
 }
 
