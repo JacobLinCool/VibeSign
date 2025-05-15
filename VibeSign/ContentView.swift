@@ -18,6 +18,7 @@ struct ContentView: View {
     @State private var showDetailSheet = false
     @StateObject private var trackerController = PencilTrackerController()
     @State private var documentToShare: TextFile? = nil
+    @State private var showDeleteAllConfirm = false
 
     var body: some View {
         NavigationSplitView {
@@ -64,6 +65,13 @@ struct ContentView: View {
                         exportSignatures()
                     }
                     .disabled(signatureHistory.isEmpty)
+                }
+                ToolbarItem {
+                    Button("Delete All") {
+                        showDeleteAllConfirm = true
+                    }
+                    .disabled(signatureHistory.isEmpty)
+                    .foregroundColor(.red)
                 }
             }
         } detail: {
@@ -139,6 +147,18 @@ struct ContentView: View {
         .sheet(item: $documentToShare) { textFile in
             ShareSheet(activityItems: [textFile.fileURL])
         }
+        .alert(
+            "Delete All Signatures?", isPresented: $showDeleteAllConfirm,
+            actions: {
+                Button("Delete All", role: .destructive) {
+                    signatureHistory.removeAll()
+                }
+                Button("Cancel", role: .cancel) {}
+            },
+            message: {
+                Text("This action cannot be undone.")
+            }
+        )
         .onChange(of: isRecording) { oldValue, newValue in
             if !newValue {
                 // Just stopped recording
