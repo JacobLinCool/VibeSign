@@ -70,14 +70,18 @@ struct ContentView: View {
                     }
                 }
                 ToolbarItem {
-                    Button("Export All") {
+                    Button {
                         exportSignatures()
+                    } label: {
+                        Label("Export All", systemImage: "square.and.arrow.up")
                     }
                     .disabled(signatureHistory.isEmpty)
                 }
                 ToolbarItem {
-                    Button("Delete All") {
+                    Button {
                         showDeleteAllConfirm = true
+                    } label: {
+                        Label("Delete All", systemImage: "trash")
                     }
                     .disabled(signatureHistory.isEmpty)
                     .foregroundColor(.red)
@@ -218,7 +222,10 @@ struct ContentView: View {
         }
 
         // Create a temporary file to share
-        let fileName = "signatures.jsonl"
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyyMMdd-HHmmss"
+        let dateString = formatter.string(from: Date())
+        let fileName = "signatures-\(dateString).jsonl"
         let tempDirectoryURL = FileManager.default.temporaryDirectory
         let fileURL = tempDirectoryURL.appendingPathComponent(fileName)
 
