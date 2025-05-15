@@ -19,6 +19,8 @@ struct ContentView: View {
     @StateObject private var trackerController = PencilTrackerController()
     @State private var documentToShare: TextFile? = nil
     @State private var showDeleteAllConfirm = false
+    @State private var showSettings = false
+    @AppStorage("applePencilOnly") private var applePencilOnly: Bool = true
 
     var body: some View {
         NavigationSplitView {
@@ -60,6 +62,13 @@ struct ContentView: View {
             }
             .navigationTitle("Signatures")
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        showSettings = true
+                    } label: {
+                        Image(systemName: "gearshape")
+                    }
+                }
                 ToolbarItem {
                     Button("Export All") {
                         exportSignatures()
@@ -78,7 +87,10 @@ struct ContentView: View {
             ZStack {
                 VStack {
                     ZStack {
-                        PencilTracker(isRecording: $isRecording, controller: trackerController) {
+                        PencilTracker(
+                            isRecording: $isRecording, applePencilOnly: applePencilOnly,
+                            controller: trackerController
+                        ) {
                             samples in
                             currentSamples = samples
                         }
@@ -170,6 +182,9 @@ struct ContentView: View {
                     // It will be cleared if "Start" or "Clear" is pressed.
                 }
             }
+        }
+        .sheet(isPresented: $showSettings) {
+            SettingsView()
         }
     }
 

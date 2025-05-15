@@ -18,12 +18,15 @@ class PencilTrackView: UIView {
     var samples: [PencilSample] = []
     var isRecording: Bool = false
     var onStop: (([PencilSample]) -> Void)?
+    var applePencilOnly: Bool = true
 
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard isRecording, let event = event else { return }
         for touch in touches {
+            if applePencilOnly && touch.type != .pencil { continue }  // Only accept Apple Pencil if enabled
             let coalesced = event.coalescedTouches(for: touch) ?? [touch]
             for t in coalesced {
+                if applePencilOnly && t.type != .pencil { continue }
                 let sample = PencilSample(
                     timestamp: t.timestamp,
                     location: t.preciseLocation(in: self),
@@ -62,6 +65,7 @@ class PencilTrackView: UIView {
 
 struct PencilTracker: UIViewRepresentable {
     @Binding var isRecording: Bool
+    var applePencilOnly: Bool = true
     var controller: PencilTrackerController? = nil
     var onStop: ([PencilSample]) -> Void
     class Coordinator {
@@ -73,11 +77,13 @@ struct PencilTracker: UIViewRepresentable {
         let view = PencilTrackView()
         view.backgroundColor = .white
         view.onStop = onStop
+        view.applePencilOnly = applePencilOnly
         controller?.view = view
         return view
     }
     func updateUIView(_ uiView: PencilTrackView, context: Context) {
         uiView.onStop = onStop
+        uiView.applePencilOnly = applePencilOnly
         if isRecording && !uiView.isRecording {
             uiView.startRecording()
         } else if !isRecording && uiView.isRecording {
