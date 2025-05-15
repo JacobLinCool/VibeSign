@@ -35,6 +35,15 @@ struct SettingsView: View {
                         Text(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1")
                             .foregroundColor(.secondary)
                     }
+                    Link(
+                        "GitHub Repository",
+                        destination: URL(string: "https://github.com/JacobLinCool/VibeSign")!
+                    )
+                    .foregroundColor(.accentColor)
+                    Text("VibeSign is open source (MIT licensed). Contributions are welcome!")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .padding(.leading, 4)
                 }
             }
             .navigationTitle("Settings")
