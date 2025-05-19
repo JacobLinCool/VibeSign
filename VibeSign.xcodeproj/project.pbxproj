@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXContainerItemProxy section */
@@ -30,21 +30,9 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		14CD8FD42DD3C007008D761F /* VibeSign */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = VibeSign;
-			sourceTree = "<group>";
-		};
-		14CD8FE32DD3C009008D761F /* VibeSignTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = VibeSignTests;
-			sourceTree = "<group>";
-		};
-		14CD8FED2DD3C009008D761F /* VibeSignUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = VibeSignUITests;
-			sourceTree = "<group>";
-		};
+		14CD8FD42DD3C007008D761F /* VibeSign */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = VibeSign; sourceTree = "<group>"; };
+		14CD8FE32DD3C009008D761F /* VibeSignTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = VibeSignTests; sourceTree = "<group>"; };
+		14CD8FED2DD3C009008D761F /* VibeSignUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = VibeSignUITests; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -187,6 +175,7 @@
 				};
 			};
 			buildConfigurationList = 14CD8FCD2DD3C007008D761F /* Build configuration list for PBXProject "VibeSign" */;
+			compatibilityVersion = "Xcode 15.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -195,7 +184,6 @@
 			);
 			mainGroup = 14CD8FC92DD3C007008D761F;
 			minimizedProjectReferenceProxies = 1;
-			preferredProjectObjectVersion = 77;
 			productRefGroup = 14CD8FD32DD3C007008D761F /* Products */;
 			projectDirPath = "";
 			projectRoot = "";

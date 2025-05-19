@@ -30,7 +30,7 @@ VibeSign is a simple iPadOS application designed for capturing and storing digit
 ### Prerequisites
 
 - iPadOS device compatible with Apple Pencil.
-- Xcode (latest version recommended).
+- Xcode (15.0+, latest version recommended).
 - Apple Pencil.
 
 ### Installation
