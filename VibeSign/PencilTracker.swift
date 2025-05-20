@@ -20,8 +20,7 @@ class PencilTrackView: UIView {
     var onStop: (([PencilSample]) -> Void)?
     var applePencilOnly: Bool = true
 
-    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard isRecording, let event = event else { return }
+    private func appendSamples(from touches: Set<UITouch>, event: UIEvent) {
         for touch in touches {
             if applePencilOnly && touch.type != .pencil { continue }  // Only accept Apple Pencil if enabled
             let coalesced = event.coalescedTouches(for: touch) ?? [touch]
@@ -37,6 +36,17 @@ class PencilTrackView: UIView {
                 samples.append(sample)
             }
         }
+    }
+
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard isRecording, let event = event else { return }
+        appendSamples(from: touches, event: event)
+        setNeedsDisplay()
+    }
+
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard isRecording, let event = event else { return }
+        appendSamples(from: touches, event: event)
         setNeedsDisplay()
     }
     func startRecording() {
